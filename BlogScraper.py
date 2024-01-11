@@ -117,6 +117,7 @@ class BlogScraper:
             os.makedirs('output')
 
         version_type = "summary" if not DETAILED_VERSION else "detailed"
-        file_name = f'output/{self.NAME}_{version_type}.csv'
+        ext = 'json' if output_json or DETAILED_VERSION else 'csv'
+        file_name = f'output/{self.NAME}_{version_type}.{ext}'
         print(f'writing to {file_name}')
         self.write_to_csv(content, file_name)

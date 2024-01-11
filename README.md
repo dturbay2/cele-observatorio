@@ -1,4 +1,4 @@
-# CELE: Social Platform Policy Blog run_scrapers
+# CELE: Social Platform Policy Blog
 
 Scraper's for policy blogs for Meta/Facebook, Twitter/X, and Google.
 

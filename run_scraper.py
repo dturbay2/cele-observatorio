@@ -51,8 +51,6 @@ class FacebookScraper(BlogScraper):
         cat2 = self.get_content(result, 'a', self.CAT2_ID, get_text=True)
         url = self.get_content(result, 'a', self.URL_ID, get_text=False)['href']
         post_text = self.get_blog_context(url, self.BLOGPOST_CONTENT_ID) if DETAILED_VERSION else ''
-        if not post_text:
-            print(url)
         return [date, title, cat1, cat2, url, post_text]
 
 
@@ -84,11 +82,11 @@ class TwitterScraper(BlogScraper):
 
 if __name__ == "__main__":
 
-    # twitter = TwitterScraper()
-    # twitter.scrape_data()
+    twitter = TwitterScraper()
+    twitter.scrape_data()
 
-    # google = GoogleScraper()
-    # google.scrape_data()
+    google = GoogleScraper()
+    google.scrape_data()
 
     fb = FacebookScraper()
     fb.scrape_data()
