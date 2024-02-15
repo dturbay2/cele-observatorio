@@ -93,6 +93,7 @@ def output_classified_list(platform, category_map, explode_categories=True):
     df.drop(columns=['post_text'], inplace=True)
     if explode_categories:
         category_columns = pd.get_dummies(df.categories.explode())
+        category_columns = category_columns.groupby(level=0).sum()
         df = pd.concat([df, category_columns], axis=1)
     return df
 
