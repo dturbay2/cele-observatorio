@@ -9,6 +9,7 @@ clasification
 """
 import json
 import pandas as pd
+import re
 import sys
 
 category_map = {
@@ -48,6 +49,28 @@ category_map = {
         ],
 }
 
+distance = 100  # number of characters allowed between regex terms
+regex_category_map = {
+    'hate_speech': [
+        r'(hate|racist|discrimination|bigoted).{0,' + r'{}'.format(distance) + r'}speech',
+        ],
+    'children': [
+        r'child(ren)?.{0,' + r'{}'.format(distance) + r'}safe(ty)?',
+        ],
+    'health_disinfo': [
+        r'(public\s)?health.{0,' + r'{}'.format(distance) + r'}(mis|dis)info(rmation)?',
+        ],
+    'political_disinfo': [
+        r'politic(al|s).{0,' + r'{}'.format(distance) + r'}(mis|dis)info(rmation)?',
+        ],
+    'gender_violence': [
+        r'(gender|woman|women).{0,' + r'{}'.format(distance) + r'}violence',
+        ],
+    'safety': [
+        r'(internet)?.{0,' + r'{}'.format(distance) + r'}safe(ty)?',
+        ],
+}
+
 _PLATFORMS = ['fb', 'google', 'twitter']
 
 def posts_to_df(json_path):
@@ -58,17 +81,23 @@ def posts_to_df(json_path):
     return pd.DataFrame.from_dict(data, orient='columns')
 
 
-def found_key_term(text, term):
-    '''returns boolean if `term` if found in text, can be made more complex'''
-    return term in text
+def found_key_term(text, term, match_type):
+    '''
+    returns boolean if `term` is found in `text`. `match_type` can be 'simple'
+    or 'regex' based on the category mapping values
+    '''
+    if match_type == 'simple':
+        return term in text
+    elif match_type == 'regex':
+        return re.search(term, text, flags=re.IGNORECASE) is not None
 
 
-def categorize_post(post_text, category_map):
+def categorize_post(post_text, category_map, match_type='regex'):
     '''returns a set of matched categories for a blog posts'''
     matched_categories = []
     for category, key_terms in category_map.items():
         for term in key_terms:
-            if found_key_term(post_text, term) and category not in matched_categories:
+            if found_key_term(post_text, term, match_type) and category not in matched_categories:
                 matched_categories.append(category)
     return matched_categories
 
@@ -101,6 +130,6 @@ def output_classified_list(platform, category_map, explode_categories=True):
 if __name__ == '__main__':
     platform = sys.argv[1]    
     output_file = f'output/{platform}_summary_tagged.csv'
-    df = output_classified_list(platform, category_map)
+    df = output_classified_list(platform, regex_category_map)
     print(f'Writing categorized {platform} posts to {output_file}')
     df.to_csv(output_file)
